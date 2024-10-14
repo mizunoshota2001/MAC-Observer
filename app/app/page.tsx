@@ -153,7 +153,7 @@ export default function Home() {
     ip?: string;
     mac?: string;
   }) => {
-    const name = prompt("名前を変更してください", device.name);
+    const name = prompt("名前を変更してね🤗", device.name);
     if (!name) return;
     setDeviceName(name, device.mac);
   };
@@ -166,23 +166,25 @@ export default function Home() {
   };
 
   return (
+    <>  
+    <input type="hidden" className="bg-blue-100 hover:bg-blue-50 bg-red-100 hover:bg-red-50 bg-green-100 hover:bg-green-50" />
     <div className="min-h-screen bg-gray-100 p-4">
       {host && (
         <div className="absolute top-1 right-2 text-xs text-gray-500 font-mono">
           IP: {host.ip} / MAC: {host.mac}
         </div>
       )}
-      {/* Container */}
       <div className="max-w-md mx-auto">
-        {/* Known Devices Section */}
-        {/* <h1 className="text-2xl font-semibold my-4 text-center">MAC Obs.</h1> */}
         <h1 className="text-2xl font-semibold my-4 text-center">
           <Image
             src="/img/title.png"
             alt="MAC Obs."
             width={500}
             height={500}
-            className="object-contain w-full m-auto px-5"
+            className="object-contain w-full m-auto px-5 invisible "
+            onLoad={(e) => {
+              (e.target as HTMLImageElement).classList.toggle("invisible");
+            }}
           />
         </h1>
         <ul className="space-y-3">
@@ -207,7 +209,6 @@ export default function Home() {
           )}
         </ul>
 
-        {/* Unknown Devices Section */}
         <div className="mt-8">
           <button
             onClick={toggleUnknown}
@@ -248,5 +249,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </>
   );
 }

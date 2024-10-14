@@ -12,7 +12,7 @@
     "mac": "00-00-cd-37-00-64"
   },
   {
-    "name": "Unknown",
+    "name": "MizPad",
     "mac": "9a-6f-fa-11-f0-5d"
   },
   {
@@ -26,5 +26,9 @@
   {
     "name": "Unknown",
     "mac": "04:7c:16:73:fa:12"
+  },
+  {
+    "name": "Unknown",
+    "mac": "01-00-5e-00-00-16"
   }
 ]
