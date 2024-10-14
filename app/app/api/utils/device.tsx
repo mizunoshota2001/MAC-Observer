@@ -6,7 +6,10 @@ const dataDir = path.join(process.cwd(), "data/devices.json");
 function getDevices(): { mac: any; name: any }[] {
   try {
     const data = fs.readFileSync(dataDir, "utf-8");
-    return JSON.parse(data);
+    const devices = JSON.parse(data);
+    return devices.filter(
+      (device: { mac: string; name: string }) => device.name !== "Unknown"
+    );
   } catch (error) {
     return [];
   }
