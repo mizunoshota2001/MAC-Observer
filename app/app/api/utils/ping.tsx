@@ -1,6 +1,8 @@
 // ping-all.js
-
+import { exec } from "node:child_process";
+import util from "util";
 import ping from "ping";
+const execPromise = util.promisify(exec);
 
 /**
  * 指定されたサブネット内の有効なIPアドレスリストを生成します。
@@ -61,6 +63,17 @@ async function asyncPool(poolLimit, array, iteratorFn) {
   return Promise.all(ret);
 }
 
+async function flush() {
+  try {
+    const { stdout, stderr } = await execPromise("arp -d");
+    if (stderr) {
+      throw new Error(stderr);
+    }
+  } catch (error) {
+    console.error("Error flushing ARP cache:", error);
+  }
+}
+
 /**
  * 全IPアドレスにPingを送信し、応答があったIPをリストアップします。
  * @param {string} subnet - サブネットのプレフィックス（例: '192.168.1'）
@@ -70,8 +83,13 @@ async function asyncPool(poolLimit, array, iteratorFn) {
  * @returns {Promise<string[]>} 応答があったIPアドレスの配列
  */
 async function pingAllIPs(subnet: string, options = {}) {
-  const { timeout = 0.001, concurrencyLimit = 255, start = 1, end = 254 } = options;
-
+  const {
+    timeout = 0.001,
+    concurrencyLimit = 255,
+    start = 1,
+    end = 254,
+  } = options;
+  await flush();
   const ipList = generateIPList(subnet, start, end);
   const aliveIPs = [];
 

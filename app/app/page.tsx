@@ -9,7 +9,6 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
-// Function to fetch devices (known and unknown)
 async function getDevices() {
   const response = await fetch("/api/getDevices");
   if (!response.ok) {
@@ -52,12 +51,26 @@ function arpFlush(btn: EventTarget & HTMLButtonElement) {
   });
 }
 
+interface Device {
+  name: string;
+  ip: string;
+  mac: string;
+  lastAccess: string;
+  avatar: string;
+}
+
 function DeviceListItem({
   device,
   setDeviceName,
   handleEdit,
   color = "blue",
   disabled = false,
+}: {
+  device: Device;
+  setDeviceName: (name: string, mac: string | undefined) => void;
+  handleEdit: (device: Device) => void;
+  color?: string;
+  disabled?: boolean;
 }) {
   return (
     <li
