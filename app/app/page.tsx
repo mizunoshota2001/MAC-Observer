@@ -1,155 +1,250 @@
 "use client";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 import {
   PencilIcon,
   EyeIcon,
   EyeSlashIcon,
+  TrashIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
+// Function to fetch devices (known and unknown)
+async function getDevices() {
+  const response = await fetch("/api/getDevices");
+  if (!response.ok) {
+    throw new Error("ネットワークの応答が正常ではありません");
+  }
+  return response.json();
+}
+async function getHost() {
+  const response = await fetch("/api/getHost");
+  if (!response.ok) {
+    throw new Error("ネットワークの応答が正常ではありません");
+  }
+  return response.json();
+}
+
+function setDeviceName(name: string, mac: string | undefined) {
+  fetch("/api/setDeviceName", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: name, mac: mac }),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error("ネットワークの応答が正常ではありません");
+    }
+    location.reload();
+  });
+}
+
+function arpFlush(btn: EventTarget & HTMLButtonElement) {
+  btn.disabled = true;
+  fetch("/api/arpFlush", {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error("ネットワークの応答が正常ではありません");
+    }
+    location.reload();
+  });
+}
+
+function DeviceListItem({
+  device,
+  setDeviceName,
+  handleEdit,
+  color = "blue",
+  disabled = false,
+}) {
+  return (
+    <li
+      key={`${device.ip}-${device.mac}`}
+      className={`relative flex items-center p-5 bg-white rounded-lg shadow hover:bg-${color}-50 transition duration-300`}
+    >
+      {/* デバイスのアバター */}
+      <div
+        className={`w-5 h-5 rounded-full shadow-inner mr-3 bg-${color}-100`}
+      />
+
+      {/* デバイス名と編集ボタン */}
+      <div className="flex items-center flex-1">
+        <span className="font-medium text-gray-800 break-all">
+          {device.name}
+        </span>
+        {!disabled && (
+          <>
+            <button
+              onClick={() => setDeviceName("Unknown", device.mac)}
+              className="ml-auto text-gray-500 hover:text-gray-700 focus:outline-none"
+              aria-label={`Delete ${device.name}`}
+            >
+              <TrashIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleEdit(device)}
+              className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              aria-label={`Edit ${device.name}`}
+            >
+              <PencilIcon className="w-4 h-4" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* デバイスの詳細情報 */}
+      <div className="absolute bottom-0 right-2 text-xs text-gray-500 font-mono">
+        IP: {device.ip} / MAC: {device.mac}
+      </div>
+    </li>
+  );
+}
+
 export default function Home() {
-  // サンプルユーザーデータ
-  const users = [
-    {
-      id: 1,
-      name: "user1",
-      avatar: "https://via.placeholder.com/40",
-      lastLogin: "2024-10-12",
-    },
-    {
-      id: 2,
-      name: "user2",
-      avatar: "https://via.placeholder.com/40",
-      lastLogin: "2024-10-10",
-    },
-    {
-      id: 3,
-      name: "user3",
-      avatar: "https://via.placeholder.com/40",
-      lastLogin: "2024-10-08",
-    },
-    // 必要に応じてユーザーを追加
-  ];
+  // State to manage devices
+  const [devices, setDevices] = useState<{
+    known: {
+      name: string;
+      ip: string;
+      mac: string;
+      lastAccess: string;
+      avatar: string;
+    }[];
+    unknown: {
+      name: string;
+      ip: string;
+      mac: string;
+      lastAccess: string;
+      avatar: string;
+    }[];
+  }>({ known: [], unknown: [] });
 
-  const blocked = [
-    {
-      id: 4,
-      name: "Unknown",
-      avatar: "https://via.placeholder.com/40",
-      lastLogin: "2024-09-30",
-    },
-    {
-      id: 5,
-      name: "Unknown",
-      avatar: "https://via.placeholder.com/40",
-      lastLogin: "2024-09-25",
-    },
-    // 必要に応じてブロックユーザーを追加
-  ];
+  const [host, setHost] = useState<{
+    name: string;
+    ip: string;
+    mac: string;
+    lastAccess: string;
+    avatar: string;
+  } | null>(null);
 
-  const handleEdit = (user: {
-    id?: number;
-    name: any;
+  // Fetch devices on component mount
+  useEffect(() => {
+    async function fetchDevices() {
+      try {
+        const fetchedDevices = await getDevices();
+        const fetchedHost = await getHost();
+        setDevices(fetchedDevices);
+        setHost(fetchedHost);
+        console.log("Fetched devices:", fetchedDevices);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    }
+    fetchDevices();
+  }, []);
+
+  // Handle edit action
+  const handleEdit = (device: {
+    name: string;
     avatar?: string;
-    lastLogin?: string;
+    lastAccess?: string;
+    ip?: string;
+    mac?: string;
   }) => {
-    // 編集アクションをここに実装
-    alert(`Edit user: ${user.name}`);
+    const name = prompt("名前を変更してください", device.name);
+    if (!name) return;
+    setDeviceName(name, device.mac);
   };
 
-  // ブロックユーザーセクションの開閉状態を管理
-  const [isBlockedOpen, setIsBlockedOpen] = useState(false);
+  // Toggle state for unknown devices
+  const [isUnknownOpen, setIsUnknownOpen] = useState(false);
 
-  const toggleBlocked = () => {
-    setIsBlockedOpen(!isBlockedOpen);
+  const toggleUnknown = () => {
+    setIsUnknownOpen(!isUnknownOpen);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      {/* ユーザーリスト */}
+      {host && (
+        <div className="absolute top-1 right-2 text-xs text-gray-500 font-mono">
+          IP: {host.ip} / MAC: {host.mac}
+        </div>
+      )}
+      {/* Container */}
       <div className="max-w-md mx-auto">
-        <h2 className="text-2xl font-semibold mb-4 text-center">User List</h2>
+        {/* Known Devices Section */}
+        {/* <h1 className="text-2xl font-semibold my-4 text-center">MAC Obs.</h1> */}
+        <h1 className="text-2xl font-semibold my-4 text-center">
+          <Image
+            src="/img/title.png"
+            alt="MAC Obs."
+            width={500}
+            height={500}
+            className="object-contain w-full m-auto px-5"
+          />
+        </h1>
         <ul className="space-y-3">
-          {users.map((user) => (
-            <li
-              key={user.id}
-              className="relative flex items-center p-4 bg-white rounded-lg shadow hover:bg-blue-50 transition duration-300"
-            >
-              {/* ユーザーアバター */}
-              <img
-                src={user.avatar}
-                alt={`${user.name}のアバター`}
-                className="w-10 h-10 rounded-full mr-4"
-              />
-              {/* ユーザー名と編集ボタン */}
-              <div className="flex items-center flex-1">
-                <span className="text-lg font-medium text-gray-800">
-                  {user.name}
-                </span>
-                <button
-                  onClick={() => handleEdit(user)}
-                  className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                  aria-label={`Edit ${user.name}`}
-                >
-                  <PencilIcon className="w-4 h-4" />
-                </button>
-              </div>
-              {/* 最終ログイン */}
-              <div className="absolute top-2 right-2 text-sm text-gray-500 mr-3">
-                <ul>
-                  <li>Last login: {user.lastLogin}</li>
-                </ul>
-              </div>
-            </li>
+          {devices.known.map((device) => (
+            <DeviceListItem
+              key={`${device.ip}-${device.mac}`}
+              device={device}
+              setDeviceName={setDeviceName}
+              handleEdit={handleEdit}
+              color="blue"
+            />
           ))}
+          {host && (
+            <DeviceListItem
+              key={`${host.ip}-${host.mac}`}
+              device={host}
+              setDeviceName={setDeviceName}
+              handleEdit={handleEdit}
+              color="green"
+              disabled={true}
+            />
+          )}
         </ul>
 
-        {/* Unknownユーザーセクション */}
+        {/* Unknown Devices Section */}
         <div className="mt-8">
           <button
-            onClick={toggleBlocked}
+            onClick={toggleUnknown}
             className="flex items-center justify-between w-full px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 transition duration-300"
           >
-            <span className="text-xl font-semibold">Unknown Users</span>
-            {isBlockedOpen ? (
+            <span className="text-xl font-semibold">Unknown Devices</span>
+            {isUnknownOpen ? (
               <EyeIcon className="w-6 h-6" />
             ) : (
               <EyeSlashIcon className="w-6 h-6" />
             )}
           </button>
-          {isBlockedOpen && (
+          {isUnknownOpen && (
             <ul className="mt-4 space-y-3">
-              {blocked.map((user) => (
-                <li
-                  key={user.id}
-                  className="relative flex items-center p-4 bg-white rounded-lg shadow hover:bg-red-50 transition duration-300"
-                >
-                  {/* ユーザーアバター */}
-                  <img
-                    src={user.avatar}
-                    alt={`${user.name}のアバター`}
-                    className="w-10 h-10 rounded-full mr-4"
-                  />
-                  {/* ユーザー名と編集ボタン */}
-                  <div className="flex items-center flex-1">
-                    <span className="text-lg font-medium text-gray-800">
-                      {user.name}
-                    </span>
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                      aria-label={`Edit ${user.name}`}
-                    >
-                      <PencilIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                  {/* 最終ログイン */}
-                  <span className="absolute top-2 right-2 text-sm text-gray-500">
-                    Last login: {user.lastLogin}
-                  </span>
-                </li>
+              {devices.unknown.map((device) => (
+                <DeviceListItem
+                  key={`${device.ip}-${device.mac}`}
+                  device={device}
+                  setDeviceName={setDeviceName}
+                  handleEdit={handleEdit}
+                  color="red"
+                />
               ))}
             </ul>
           )}
+        </div>
+
+        <div className="mt-4">
+          <div className="flex items-center justify-end">
+            <button
+              onClick={(e) => arpFlush(e.currentTarget)}
+              className="flex items-center justify-end px-4 py-2 bg-amber-200 rounded-lg shadow hover:bg-amber-300 transition duration-300"
+            >
+              <span className="text-xl font-semibold mr-2">Update</span>
+              <ArrowPathIcon className="w-6 h-6" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
