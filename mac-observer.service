@@ -8,7 +8,7 @@ WorkingDirectory=/home/pi5/MAC-Observer
 Restart=always
 User=root
 Environment=NODE_ENV=production
-ExecStartPre=/bin/sleep 10  # ネットワークが完全に起動するまで待つ
+ExecStartPre=/bin/sleep 10
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
