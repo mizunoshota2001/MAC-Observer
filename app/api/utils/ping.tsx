@@ -107,8 +107,9 @@ async function flush(): Promise<void> {
         console.error("Error flushing ARP cache:", error);
       }
     }
+  } else {
+    console.error("対応していないOSです。");
   }
-  console.error("対応していないOSです。");
 }
 
 /**
@@ -129,7 +130,7 @@ async function pingAllIPs(
   options: PingOptions = {}
 ): Promise<string[]> {
   const {
-    timeout = 0.001,
+    timeout = 1,
     concurrencyLimit = 255,
     start = 1,
     end = 254,
