@@ -8,8 +8,10 @@ WorkingDirectory=/home/pi5/MAC-Observer
 Restart=always
 User=root
 Environment=NODE_ENV=production
-ExecStartPre=/bin/sleep 10
+ExecStartPre=/bin/sleep 10 ; ネットワークが完全に起動するまで待つ
 ExecReload=/bin/kill -HUP $MAINPID
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
 
 [Install]
 WantedBy=multi-user.target
