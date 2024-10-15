@@ -12,7 +12,11 @@ const execPromise = util.promisify(exec);
  * @param end - 終了ホスト番号
  * @returns IPアドレスの配列
  */
-function generateIPList(subnet: string, start: number = 1, end: number = 254): string[] {
+function generateIPList(
+  subnet: string,
+  start: number = 1,
+  end: number = 254
+): string[] {
   const ipList: string[] = [];
   for (let i = start; i <= end; i++) {
     ipList.push(`${subnet}.${i}`);
@@ -74,20 +78,37 @@ async function asyncPool<T, R>(
 
   return Promise.all(ret);
 }
-
+import os from "os";
 async function flush(): Promise<void> {
-  try {
-    const { stderr } = await execPromise("arp -d");
-    if (stderr) {
-      throw new Error(stderr);
+  const platform = os.platform();
+  if (platform === "win32") {
+    try {
+      const { stderr } = await execPromise("arp -d");
+      if (stderr) {
+        throw new Error(stderr);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error flushing ARP cache:", error.message);
+      } else {
+        console.error("Error flushing ARP cache:", error);
+      }
     }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error flushing ARP cache:", error.message);
-    } else {
-      console.error("Error flushing ARP cache:", error);
+  } else if (platform === "linux") {
+    try {
+      const { stderr } = await execPromise("ip neigh flush all");
+      if (stderr) {
+        throw new Error(stderr);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error flushing ARP cache:", error.message);
+      } else {
+        console.error("Error flushing ARP cache:", error);
+      }
     }
   }
+  console.error("対応していないOSです。");
 }
 
 /**
@@ -103,7 +124,10 @@ interface PingOptions {
   end?: number;
 }
 
-async function pingAllIPs(subnet: string, options: PingOptions = {}): Promise<string[]> {
+async function pingAllIPs(
+  subnet: string,
+  options: PingOptions = {}
+): Promise<string[]> {
   const {
     timeout = 0.001,
     concurrencyLimit = 255,
