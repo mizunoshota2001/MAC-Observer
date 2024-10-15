@@ -24,3 +24,14 @@ sudo npm run build
 
 sudo npm run start
 ```
+
+
+```bash
+cd
+cd MAC-Observer
+sudo touch /etc/systemd/system/mac-observer.service
+sudo cp -a  mac-observer.service /etc/systemd/system/mac-observer.service
+sudo systemctl daemon-reload
+sudo systemctl enable mac-observer.service
+
+```

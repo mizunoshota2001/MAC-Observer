@@ -1,0 +1,15 @@
+[Unit]
+Description=MAC Observer Node.js Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/npm run start
+WorkingDirectory=/home/pi5/MAC-Observer
+Restart=always
+User=pi5
+Environment=NODE_ENV=production
+ExecStartPre=/bin/sleep 10  # ネットワークが完全に起動するまで待つ
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
