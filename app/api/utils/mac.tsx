@@ -45,7 +45,7 @@ async function execLinuxARP() {
       parts.length > 3 &&
       parts[3].match(/([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})/)
     ) {
-      macAddresses.push({ ip: parts[1].slice(1, -1), mac: parts[3].replace(":","-") });
+      macAddresses.push({ ip: parts[1].slice(1, -1), mac: parts[3].replace(/:/g, "-") });
     }
   });
   return macAddresses;
