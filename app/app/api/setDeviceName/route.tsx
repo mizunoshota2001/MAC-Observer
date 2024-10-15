@@ -1,7 +1,8 @@
 import { upsert } from "../utils/device";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function POST(request: { json: () => any }) {
+export async function POST(request: NextRequest) {
   const body = await request.json();
   upsert(body);
-  return new Response(JSON.stringify({ success: 1 }));
+  return NextResponse.json({ success: 1 });
 }

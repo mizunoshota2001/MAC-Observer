@@ -1,9 +1,5 @@
 [
   {
-    "name": "MizPhone",
-    "mac": "94-b9-7e-dd-bf-90"
-  },
-  {
     "name": "水野翔太(iPad)",
     "mac": "9a-6f-fa-11-f0-5d"
   },
@@ -14,5 +10,9 @@
   {
     "name": "zero2",
     "mac": "2c-cf-67-31-1b-46"
+  },
+  {
+    "name": "MizPhone",
+    "mac": "94-b9-7e-dd-bf-90"
   }
 ]

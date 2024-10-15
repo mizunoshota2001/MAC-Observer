@@ -55,12 +55,12 @@ async function execLinuxARP() {
 function getMacAddress() {
   const networkInterfaces = os.networkInterfaces();
 
-  for (let interfaceName in networkInterfaces) {
+  for (const interfaceName in networkInterfaces) {
     const interfaces = networkInterfaces[interfaceName];
     if (!interfaces) {
       continue;
     }
-    for (let iface of interfaces) {
+    for (const iface of interfaces) {
       if (
         iface.family === "IPv4" &&
         iface.mac &&
