@@ -3,7 +3,7 @@ Description=MAC Observer Node.js Service
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/npm run start
+ExecStart=/usr/bin/sudo /usr/bin/npm run start
 WorkingDirectory=/home/pi5/MAC-Observer
 Restart=always
 User=root
