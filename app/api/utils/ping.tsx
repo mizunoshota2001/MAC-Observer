@@ -96,7 +96,7 @@ async function flush(): Promise<void> {
     }
   } else if (platform === "linux") {
     try {
-      const { stderr } = await execPromise("ip neigh flush all");
+      const { stderr } = await execPromise("sudo /usr/sbin/ip neigh flush all");
       if (stderr) {
         throw new Error(stderr);
       }
