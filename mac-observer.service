@@ -6,7 +6,7 @@ After=network.target
 ExecStart=/usr/bin/npm run start
 WorkingDirectory=/home/pi5/MAC-Observer
 Restart=always
-User=pi5
+User=root
 Environment=NODE_ENV=production
 ExecStartPre=/bin/sleep 10  # ネットワークが完全に起動するまで待つ
 ExecReload=/bin/kill -HUP $MAINPID
