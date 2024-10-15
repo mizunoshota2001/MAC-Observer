@@ -65,7 +65,7 @@ function getMacAddress() {
         iface.mac !== "00:00:00:00:00:00" &&
         !iface.internal
       ) {
-        return { ip: iface.address, mac: iface.mac };
+        return { ip: iface.address, mac: iface.mac.replace(/:/g, "-") };
       }
     }
   }
