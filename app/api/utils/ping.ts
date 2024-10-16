@@ -129,7 +129,7 @@ async function pingAllIPs(
   subnet: string,
   options: PingOptions = {}
 ): Promise<string[]> {
-  const { timeout = 1, concurrencyLimit = 255, start = 1, end = 254 } = options;
+  const { timeout = 2, concurrencyLimit = 100, start = 1, end = 254 } = options;
   await flush();
   const ipList = generateIPList(subnet, start, end);
   const aliveIPs: string[] = [];
