@@ -1,6 +1,7 @@
 import { getLanMacAddresses, getMacAddress } from "../utils/mac";
 import { getDevices } from "../utils/device";
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 async function GET() {
   const macAddresses = await getLanMacAddresses();

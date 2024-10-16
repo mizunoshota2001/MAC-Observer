@@ -20,6 +20,10 @@ function getDevices(): Device[] {
 }
 
 function save(data: Device[]): void {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(path.dirname(dataDir), { recursive: true });
+    fs.writeFileSync(dataDir, JSON.stringify([]), "utf-8");
+  }
   fs.writeFileSync(dataDir, JSON.stringify(data, null, 2), "utf-8");
 }
 
