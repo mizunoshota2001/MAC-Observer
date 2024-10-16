@@ -1,194 +1,37 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import {
-  PencilIcon,
   EyeIcon,
   EyeSlashIcon,
-  TrashIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
+import type { Device, Devices } from "@/lib/types";
+import DeviceListItem from "@/components/DeviceListItem";
+import { getDevices, getHost, arpFlush } from "@/lib/api";
 
-async function getDevices() {
-  const response = await fetch("/api/getDevices");
-  if (!response.ok) {
-    throw new Error("ネットワークの応答が正常ではありません");
-  }
-  return response.json();
-}
-async function getHost() {
-  const response = await fetch("/api/getHost");
-  if (!response.ok) {
-    throw new Error("ネットワークの応答が正常ではありません");
-  }
-  return response.json();
-}
-
-function setDeviceName(name: string, mac: string | undefined) {
-  fetch("/api/setDeviceName", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: name, mac: mac }),
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error("ネットワークの応答が正常ではありません");
-    }
-    location.reload();
-  });
-}
-
-function arpFlush(btn: EventTarget & HTMLButtonElement) {
-  btn.disabled = true;
-  fetch("/api/arpFlush", {
-    method: "GET",
-    cache: "no-store",
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error("ネットワークの応答が正常ではありません");
-    }
-    location.reload();
-  });
-}
-
-function updateEvent(e: { currentTarget: EventTarget & HTMLButtonElement }) {
+function update(e: { currentTarget: EventTarget & HTMLButtonElement }) {
   arpFlush(e.currentTarget);
   const icon = e.currentTarget.querySelector(".arrow-path-icon");
   if (!icon) return;
   icon.classList.add("animate-spin");
 }
 
-interface Device {
-  name: string;
-  ip: string;
-  mac: string;
-  lastAccess: string;
-  avatar: string;
-}
+function Page() {
+  const [devices, setDevices] = useState<Devices>({ known: [], unknown: [] });
+  const [isUnknownOpen, setIsUnknownOpen] = useState(false);
+  const [host, setHost] = useState<Device | null>(null);
 
-function DeviceListItem({
-  device,
-  setDeviceName,
-  handleEdit,
-  color = "blue",
-  disabled = false,
-}: {
-  device: Device;
-  setDeviceName: (name: string, mac: string | undefined) => void;
-  handleEdit: (device: Device) => void;
-  color?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <li
-      key={`${device.ip}-${device.mac}`}
-      className={`relative flex items-center p-5 bg-white rounded-lg shadow hover:bg-${color}-50 transition duration-300`}
-    >
-      <div className="relative">
-        <div
-          className={`animate-ping absolute w-5 h-5 rounded-full bg-${color}-100 opacity-50`}
-        />
-        <div
-          className={`relative w-5 h-5 rounded-full shadow-inner mr-3 bg-${color}-100`}
-        />
-      </div>
+  async function fetchDevices() {
+    await Promise.all([getDevices().then(setDevices), getHost().then(setHost)]);
+  }
+  function toggleUnknown() {
+    setIsUnknownOpen(!isUnknownOpen);
+  }
 
-      {/* デバイス名と編集ボタン */}
-      <div className="flex items-center flex-1">
-        <span className="font-medium text-gray-800 break-all">
-          {device.name}
-        </span>
-        {!disabled && (
-          <>
-            <button
-              onClick={() => setDeviceName("Unknown", device.mac)}
-              className="ml-auto text-gray-500 hover:text-gray-700 focus:outline-none"
-              aria-label={`Delete ${device.name}`}
-            >
-              <TrashIcon className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleEdit(device)}
-              className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-              aria-label={`Edit ${device.name}`}
-            >
-              <PencilIcon className="w-4 h-4" />
-            </button>
-          </>
-        )}
-      </div>
-
-      {/* デバイスの詳細情報 */}
-      <div className="absolute bottom-0 right-2 text-xs text-gray-500 font-mono">
-        IP: {device.ip} / MAC: {device.mac}
-      </div>
-    </li>
-  );
-}
-
-export default function Home() {
-  // State to manage devices
-  const [devices, setDevices] = useState<{
-    known: {
-      name: string;
-      ip: string;
-      mac: string;
-      lastAccess: string;
-      avatar: string;
-    }[];
-    unknown: {
-      name: string;
-      ip: string;
-      mac: string;
-      lastAccess: string;
-      avatar: string;
-    }[];
-  }>({ known: [], unknown: [] });
-
-  const [host, setHost] = useState<{
-    name: string;
-    ip: string;
-    mac: string;
-    lastAccess: string;
-    avatar: string;
-  } | null>(null);
-
-  // Fetch devices on component mount
   useEffect(() => {
-    async function fetchDevices() {
-      try {
-        const fetchedDevices = await getDevices();
-        const fetchedHost = await getHost();
-        setDevices(fetchedDevices);
-        setHost(fetchedHost);
-        console.log("Fetched devices:", fetchedDevices);
-      } catch (error) {
-        console.error("Error fetching devices:", error);
-      }
-    }
     fetchDevices();
   }, []);
-
-  // Handle edit action
-  const handleEdit = (device: {
-    name: string;
-    avatar?: string;
-    lastAccess?: string;
-    ip?: string;
-    mac?: string;
-  }) => {
-    const name = prompt("名前を変更してね🤗", device.name);
-    if (!name) return;
-    setDeviceName(name, device.mac);
-  };
-
-  // Toggle state for unknown devices
-  const [isUnknownOpen, setIsUnknownOpen] = useState(false);
-
-  const toggleUnknown = () => {
-    setIsUnknownOpen(!isUnknownOpen);
-  };
 
   return (
     <>
@@ -247,8 +90,6 @@ export default function Home() {
               <DeviceListItem
                 key={`${device.ip}-${device.mac}`}
                 device={device}
-                setDeviceName={setDeviceName}
-                handleEdit={handleEdit}
                 color="blue"
               />
             ))}
@@ -256,8 +97,6 @@ export default function Home() {
               <DeviceListItem
                 key={`${host.ip}-${host.mac}`}
                 device={host}
-                setDeviceName={setDeviceName}
-                handleEdit={handleEdit}
                 color="green"
                 disabled={true}
               />
@@ -282,8 +121,6 @@ export default function Home() {
                   <DeviceListItem
                     key={`${device.ip}-${device.mac}`}
                     device={device}
-                    setDeviceName={setDeviceName}
-                    handleEdit={handleEdit}
                     color="red"
                   />
                 ))}
@@ -294,7 +131,7 @@ export default function Home() {
           <div className="mt-4">
             <div className="flex items-center justify-end">
               <button
-                onClick={updateEvent}
+                onClick={update}
                 className="flex items-center justify-end px-4 py-2 bg-amber-200 rounded-lg shadow hover:bg-amber-300 transition duration-300"
               >
                 <span className="text-xl font-semibold mr-2">Update</span>
@@ -307,3 +144,5 @@ export default function Home() {
     </>
   );
 }
+
+export default Page;

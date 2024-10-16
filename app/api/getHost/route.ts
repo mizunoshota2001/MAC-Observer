@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMacAddress } from "../utils/mac";
+import { getMacAddress } from "@/lib/mac";
 export const dynamic = "force-dynamic";
 
 export async function GET() {

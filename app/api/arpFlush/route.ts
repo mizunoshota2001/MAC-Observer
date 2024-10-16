@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { pingAllIPs } from "../utils/ping";
-import { getMacAddress } from "../utils/mac";
+import { pingAllIPs } from "@/lib/ping";
+import { getMacAddress } from "@/lib/mac";
 export const dynamic = "force-dynamic";
 
 export async function GET() {

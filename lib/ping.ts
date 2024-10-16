@@ -2,7 +2,6 @@ import { exec } from "node:child_process";
 import util from "util";
 import ping from "ping";
 import os from "os";
-
 const execPromise = util.promisify(exec);
 
 /**
@@ -96,7 +95,9 @@ async function flush(): Promise<void> {
     }
   } else if (platform === "linux") {
     try {
-      const { stderr } = await execPromise("/usr/bin/sudo /usr/sbin/ip neigh flush all");
+      const { stderr } = await execPromise(
+        "/usr/bin/sudo /usr/sbin/ip neigh flush all"
+      );
       if (stderr) {
         throw new Error(stderr);
       }

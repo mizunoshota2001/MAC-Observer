@@ -1,5 +1,5 @@
-import { getLanMacAddresses, getMacAddress } from "../utils/mac";
-import { getDevices } from "../utils/device";
+import { getLanMacAddresses, getMacAddress } from "@/lib/mac";
+import { getDevices } from "@/lib/device";
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
