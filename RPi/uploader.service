@@ -1,0 +1,12 @@
+[Unit]
+Description=uploader
+After=network.target
+
+[Service]
+ExecStart=python uploader.py
+WorkingDirectory=/home/pi5/MAC-Observer
+Restart=always
+User=pi5
+
+[Install]
+WantedBy=multi-user.target
