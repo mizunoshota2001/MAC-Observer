@@ -1,7 +1,7 @@
-// ping-all.ts
 import { exec } from "node:child_process";
 import util from "util";
 import ping from "ping";
+import os from "os";
 
 const execPromise = util.promisify(exec);
 
@@ -78,7 +78,7 @@ async function asyncPool<T, R>(
 
   return Promise.all(ret);
 }
-import os from "os";
+
 async function flush(): Promise<void> {
   const platform = os.platform();
   if (platform === "win32") {
@@ -96,7 +96,7 @@ async function flush(): Promise<void> {
     }
   } else if (platform === "linux") {
     try {
-      const { stderr } = await execPromise("sudo /usr/sbin/ip neigh flush all");
+      const { stderr } = await execPromise("/usr/bin/sudo /usr/sbin/ip neigh flush all");
       if (stderr) {
         throw new Error(stderr);
       }
@@ -129,13 +129,7 @@ async function pingAllIPs(
   subnet: string,
   options: PingOptions = {}
 ): Promise<string[]> {
-  const {
-    timeout = 1,
-    concurrencyLimit = 255,
-    start = 1,
-    end = 254,
-  } = options;
-
+  const { timeout = 1, concurrencyLimit = 255, start = 1, end = 254 } = options;
   await flush();
   const ipList = generateIPList(subnet, start, end);
   const aliveIPs: string[] = [];

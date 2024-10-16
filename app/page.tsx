@@ -43,6 +43,7 @@ function arpFlush(btn: EventTarget & HTMLButtonElement) {
   btn.disabled = true;
   fetch("/api/arpFlush", {
     method: "GET",
+    cache: "no-store",
   }).then((response) => {
     if (!response.ok) {
       throw new Error("ネットワークの応答が正常ではありません");
@@ -179,89 +180,92 @@ export default function Home() {
   };
 
   return (
-    <>  
-    <input type="hidden" className="bg-blue-100 hover:bg-blue-50 bg-red-100 hover:bg-red-50 bg-green-100 hover:bg-green-50" />
-    <div className="min-h-screen bg-gray-100 p-4">
-      {host && (
-        <div className="absolute top-1 right-2 text-xs text-gray-500 font-mono">
-          IP: {host.ip} / MAC: {host.mac}
-        </div>
-      )}
-      <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-semibold my-4 text-center">
-          <Image
-            src="/img/title.png"
-            alt="MAC Obs."
-            width={500}
-            height={500}
-            className="object-contain w-full m-auto px-5 invisible "
-            onLoad={(e) => {
-              (e.target as HTMLImageElement).classList.toggle("invisible");
-            }}
-          />
-        </h1>
-        <ul className="space-y-3">
-          {devices.known.map((device) => (
-            <DeviceListItem
-              key={`${device.ip}-${device.mac}`}
-              device={device}
-              setDeviceName={setDeviceName}
-              handleEdit={handleEdit}
-              color="blue"
+    <>
+      <input
+        type="hidden"
+        className="bg-blue-100 hover:bg-blue-50 bg-red-100 hover:bg-red-50 bg-green-100 hover:bg-green-50"
+      />
+      <div className="min-h-screen bg-gray-100 p-4">
+        {host && (
+          <div className="absolute top-1 right-2 text-xs text-gray-500 font-mono">
+            IP: {host.ip} / MAC: {host.mac}
+          </div>
+        )}
+        <div className="max-w-md mx-auto">
+          <h1 className="text-2xl font-semibold my-4 text-center">
+            <Image
+              src="/img/title.png"
+              alt="MAC Obs."
+              width={500}
+              height={500}
+              className="object-contain w-full m-auto px-5 invisible "
+              onLoad={(e) => {
+                (e.target as HTMLImageElement).classList.toggle("invisible");
+              }}
             />
-          ))}
-          {host && (
-            <DeviceListItem
-              key={`${host.ip}-${host.mac}`}
-              device={host}
-              setDeviceName={setDeviceName}
-              handleEdit={handleEdit}
-              color="green"
-              disabled={true}
-            />
-          )}
-        </ul>
-
-        <div className="mt-8">
-          <button
-            onClick={toggleUnknown}
-            className="flex items-center justify-between w-full px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 transition duration-300"
-          >
-            <span className="text-xl font-semibold">Unknown Devices</span>
-            {isUnknownOpen ? (
-              <EyeIcon className="w-6 h-6" />
-            ) : (
-              <EyeSlashIcon className="w-6 h-6" />
+          </h1>
+          <ul className="space-y-3">
+            {devices.known.map((device) => (
+              <DeviceListItem
+                key={`${device.ip}-${device.mac}`}
+                device={device}
+                setDeviceName={setDeviceName}
+                handleEdit={handleEdit}
+                color="blue"
+              />
+            ))}
+            {host && (
+              <DeviceListItem
+                key={`${host.ip}-${host.mac}`}
+                device={host}
+                setDeviceName={setDeviceName}
+                handleEdit={handleEdit}
+                color="green"
+                disabled={true}
+              />
             )}
-          </button>
-          {isUnknownOpen && (
-            <ul className="mt-4 space-y-3">
-              {devices.unknown.map((device) => (
-                <DeviceListItem
-                  key={`${device.ip}-${device.mac}`}
-                  device={device}
-                  setDeviceName={setDeviceName}
-                  handleEdit={handleEdit}
-                  color="red"
-                />
-              ))}
-            </ul>
-          )}
-        </div>
+          </ul>
 
-        <div className="mt-4">
-          <div className="flex items-center justify-end">
+          <div className="mt-8">
             <button
-              onClick={(e) => arpFlush(e.currentTarget)}
-              className="flex items-center justify-end px-4 py-2 bg-amber-200 rounded-lg shadow hover:bg-amber-300 transition duration-300"
+              onClick={toggleUnknown}
+              className="flex items-center justify-between w-full px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 transition duration-300"
             >
-              <span className="text-xl font-semibold mr-2">Update</span>
-              <ArrowPathIcon className="w-6 h-6" />
+              <span className="text-xl font-semibold">Unknown Devices</span>
+              {isUnknownOpen ? (
+                <EyeIcon className="w-6 h-6" />
+              ) : (
+                <EyeSlashIcon className="w-6 h-6" />
+              )}
             </button>
+            {isUnknownOpen && (
+              <ul className="mt-4 space-y-3">
+                {devices.unknown.map((device) => (
+                  <DeviceListItem
+                    key={`${device.ip}-${device.mac}`}
+                    device={device}
+                    setDeviceName={setDeviceName}
+                    handleEdit={handleEdit}
+                    color="red"
+                  />
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="mt-4">
+            <div className="flex items-center justify-end">
+              <button
+                onClick={(e) => arpFlush(e.currentTarget)}
+                className="flex items-center justify-end px-4 py-2 bg-amber-200 rounded-lg shadow hover:bg-amber-300 transition duration-300"
+              >
+                <span className="text-xl font-semibold mr-2">Update</span>
+                <ArrowPathIcon className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

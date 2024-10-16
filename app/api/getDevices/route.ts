@@ -1,5 +1,6 @@
 import { getLanMacAddresses, getMacAddress } from "../utils/mac";
 import { getDevices } from "../utils/device";
+import { NextResponse } from "next/server";
 
 async function GET() {
   const macAddresses = await getLanMacAddresses();
@@ -7,7 +8,7 @@ async function GET() {
   macAddresses.push(host);
   const saved = getDevices();
 
-  if (!macAddresses) return new Response(JSON.stringify([]));
+  if (!macAddresses) return NextResponse.json([]);
 
   const devices = macAddresses.map((device) => {
     const savedDevice = saved.find(
@@ -24,9 +25,9 @@ async function GET() {
     devices.filter((device) => device.name === "Unknown"),
   ];
 
-  const responce = { known: known, unknown: unknown };
+  const response = { known: known, unknown: unknown };
 
-  return new Response(JSON.stringify(responce));
+  return NextResponse.json(response);
 }
 
 export { GET };

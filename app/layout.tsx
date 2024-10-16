@@ -4,6 +4,8 @@ export const metadata = {
   description: "MAC Observer",
 };
 
+
+
 export default function RootLayout({
   children,
 }: {
