@@ -52,6 +52,13 @@ function arpFlush(btn: EventTarget & HTMLButtonElement) {
   });
 }
 
+function updateEvent(e: { currentTarget: EventTarget & HTMLButtonElement }) {
+  arpFlush(e.currentTarget);
+  const icon = e.currentTarget.querySelector(".arrow-path-icon");
+  if (!icon) return;
+  icon.classList.add("animate-spin");
+}
+
 interface Device {
   name: string;
   ip: string;
@@ -78,10 +85,14 @@ function DeviceListItem({
       key={`${device.ip}-${device.mac}`}
       className={`relative flex items-center p-5 bg-white rounded-lg shadow hover:bg-${color}-50 transition duration-300`}
     >
-      {/* デバイスのアバター */}
-      <div
-        className={`w-5 h-5 rounded-full shadow-inner mr-3 bg-${color}-100`}
-      />
+      <div className="relative">
+        <div
+          className={`animate-ping absolute w-5 h-5 rounded-full bg-${color}-100 opacity-50`}
+        />
+        <div
+          className={`relative w-5 h-5 rounded-full shadow-inner mr-3 bg-${color}-100`}
+        />
+      </div>
 
       {/* デバイス名と編集ボタン */}
       <div className="flex items-center flex-1">
@@ -256,11 +267,11 @@ export default function Home() {
           <div className="mt-4">
             <div className="flex items-center justify-end">
               <button
-                onClick={(e) => arpFlush(e.currentTarget)}
+                onClick={updateEvent}
                 className="flex items-center justify-end px-4 py-2 bg-amber-200 rounded-lg shadow hover:bg-amber-300 transition duration-300"
               >
                 <span className="text-xl font-semibold mr-2">Update</span>
-                <ArrowPathIcon className="w-6 h-6" />
+                <ArrowPathIcon className="w-6 h-6 arrow-path-icon" />
               </button>
             </div>
           </div>

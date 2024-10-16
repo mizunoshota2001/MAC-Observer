@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { pingAllIPs } from "../utils/ping";
 import { getMacAddress } from "../utils/mac";
 import logger from "../utils/logger";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const device = getMacAddress();
