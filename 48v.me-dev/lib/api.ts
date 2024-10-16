@@ -7,7 +7,7 @@ async function getDevices(place: string) {
       throw new Error("Network response was not ok");
     }
     return { known: await response.json(), unknown: [] };
-  } catch (e) {
+  } catch {
     return { known: [], unknown: [] };
   }
 }

@@ -74,7 +74,7 @@ function Page() {
           <div className="text-right font-thin italic px-1">
             ※5分ごとに更新　リアルタイム版は
             <a
-              href="http://mac-obs.local"
+              href="http://mac-obs.local:3000"
               className="font-bold text-blue-500 hover:underline"
             >
               こちら
@@ -91,7 +91,7 @@ function Page() {
             <h2 className="text-xl font-semibold mb-4">端末の登録について</h2>
             <p className="text-gray-700 mb-2">
               <a
-                href="http://mac-obs.local"
+                href="http://mac-obs.local:3000"
                 className="text-blue-500 hover:underline"
               >
                 mac-obs.local
