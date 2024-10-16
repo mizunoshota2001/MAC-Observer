@@ -216,6 +216,33 @@ export default function Home() {
             />
           </h1>
           <ul className="space-y-3">
+            {devices.known.length === 0 && (
+              <>
+                <li
+                  className={`animate-pulse relative flex items-center p-5 bg-gray-50 rounded-lg shadow hover:bg-gray-50 transition duration-300`}
+                >
+                  <div
+                    className={` w-5 h-5 rounded-full shadow-inner mr-3 bg-gray-200`}
+                  />
+                  <div className="flex items-center flex-1">
+                    <div className="w-full grid grid-rows-2 gap-2">
+                      <div className="h-2 bg-gray-200 rounded" />
+                      <div className="h-2 bg-gray-200 rounded" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 right-2 text-xs text-gray-500 font-mono">
+                    IP:{" "}
+                    <span className="h-2 bg-gray-200 rounded">
+                      <span className="invisible">000.000.000.000</span>
+                    </span>{" "}
+                    / MAC:{" "}
+                    <span className="h-2 bg-gray-200 rounded">
+                      <span className="invisible">ff-ff-ff-ff-ff-ff</span>
+                    </span>
+                  </div>
+                </li>
+              </>
+            )}
             {devices.known.map((device) => (
               <DeviceListItem
                 key={`${device.ip}-${device.mac}`}
