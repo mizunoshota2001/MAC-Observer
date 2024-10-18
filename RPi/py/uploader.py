@@ -13,7 +13,8 @@ _5MINUTES = 5 * 60
 
 def send():
     try:
-        urllib.request.Request(FLUSH)
+        req = urllib.request.Request(FLUSH)
+        urllib.request.urlopen(req)
         req = urllib.request.Request(GET_FROM)
         body = urllib.request.urlopen(req)
         req = urllib.request.Request(
