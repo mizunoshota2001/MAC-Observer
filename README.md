@@ -68,7 +68,7 @@ sudo reboot
 
 ゼミ生向けの外部閲覧用拡張機能については、以下のリポジトリをご参照ください。
 
-[外部閲覧用拡張機能リポジトリ](https://github.com/mizunoshota2001/MAC-Observer-Extensions)
+[外部閲覧用拡張機能リポジトリ](https://github.com/mizunoshota2001/MAC-Observer-public-extension)
 
 ---
 
